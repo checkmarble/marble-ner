@@ -18,7 +18,7 @@ model = GLiNER.from_pretrained(MODEL)
 app = FastAPI()
 
 @app.post("/detect")
-async def detect(query: Query):
+def detect(query: Query):
   labels = LABELS
   entities = model.predict_entities(query.text, labels, threshold=0.1)
 
