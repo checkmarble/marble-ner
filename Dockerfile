@@ -17,7 +17,8 @@ COPY pyproject.toml poetry.lock /app/
 RUN \
   poetry install && \
   poetry run python -c 'import os, gliner; gliner.GLiNER.from_pretrained(os.getenv("GLINER_MODEL"))' && \
-  poetry cache clear --all ''
+  poetry cache clear --all '' && \
+  rm -rf /root/.cache/pypoetry/artifacts
 
 COPY . /app
 
