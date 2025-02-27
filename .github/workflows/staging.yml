@@ -1,0 +1,21 @@
+name: Deploy to staging
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    uses: ./.github/workflows/build.yml
+    permissions:
+      contents: read
+      id-token: write
+    with:
+      environment: staging
+      version: latest
+
+  deploy:
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo Deploying...

@@ -1,0 +1,53 @@
+name: Build container image
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        type: string
+        description: "Environment to deploy to"
+        required: false
+      image:
+        type: string
+        description: "Version to build"
+        required: true
+      push:
+        type: boolean
+        description: "Whether to push the container image or not"
+        default: false
+
+jobs:
+  build_container_image:
+    name: Build container image
+    environment: ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Docker
+        uses: docker/setup-buildx-action@v3
+
+      - name: Authenticate to GCP
+        id: auth
+        uses: google-github-actions/auth@v2
+        if: ${{ inputs.push }}
+        with:
+          token_format: access_token
+          project_id: ${{ vars.GCP_PROJECT_ID }}
+          workload_identity_provider: ${{ vars.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.SERVICE_ACCOUNT_EMAIL }}
+
+      - name: Authenticate to Artifact Registry
+        uses: docker/login-action@v3
+        if: ${{ inputs.push }}
+        with:
+          registry: europe-west1-docker.pkg.dev
+          username: oauth2accesstoken
+          password: ${{ steps.auth.outputs.access_token }}
+
+      - name: Build container image
+        uses: docker/build-push-action@v5
+        with:
+          push: ${{ inputs.push }}
+          tags: ${{ inputs.image }}

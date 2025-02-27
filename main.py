@@ -17,6 +17,10 @@ class Match(BaseModel):
 model = GLiNER.from_pretrained(MODEL)
 app = FastAPI()
 
+@app.get("/-/health")
+def healthcheck():
+  pass
+
 @app.post("/detect")
 def detect(query: Query):
   labels = LABELS

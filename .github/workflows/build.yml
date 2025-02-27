@@ -1,0 +1,58 @@
+name: Build and test
+
+on:
+  pull_request:
+  workflow_call:
+    inputs:
+      environment:
+        type: string
+        description: "Environment to deploy to"
+        required: false
+      version:
+        type: string
+        description: Version to build
+        required: true
+      push:
+        type: boolean
+        description: Whether to push the image or not
+        required: false
+        default: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Python
+        uses: actions/setup-python@v4
+
+      - name: Install poetry
+        uses: abatilo/actions-poetry@v4
+
+      - name: Setup a local virtual environment
+        run: |
+          poetry config virtualenvs.create true --local
+          poetry config virtualenvs.in-project true --local
+
+      - uses: actions/cache@v3
+        name: Define a cache for the virtual environment based on the dependencies lock file
+        with:
+          path: ./.venv
+          key: venv-${{ hashFiles('poetry.lock') }}
+
+      - name: Install the project dependencies
+        run: poetry install
+
+      - name: Run the automated tests (for example)
+        run: poetry run pytest -v
+
+  build:
+    uses: ./.github/workflows/docker.yml
+    needs: [test]
+    with:
+      environment: ${{ inputs.environment }}
+      image: europe-west1-docker.pkg.dev/marble-infra/marble/marble-ner:${{ inputs.version || 'dev' }}
+      push: ${{ inputs.push || false }}
+            
