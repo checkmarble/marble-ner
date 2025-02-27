@@ -12,20 +12,15 @@ dependencies = [
     "uvicorn[default] (>=0.34.0,<0.35.0)",
     "gunicorn (>=23.0.0,<24.0.0)",
     "torch (>=2.6.0,<3.0.0)",
-    "gliner (>=0.2.16,<0.3.0)"
+    "gliner (>=0.2.16,<0.3.0)",
+    "httpx (>=0.28.1,<0.29.0)",
 ]
 
 [tool.poetry]
 package-mode = false
 
-[[tool.poetry.source]]
-name = "pytorch"
-url = "https://download.pytorch.org/whl/cpu"
-priority = "explicit"
-
-[tool.poetry.dependencies]
-torch = { source = "pytorch" }
-torchvision = { source = "pytorch" }
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.4"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
