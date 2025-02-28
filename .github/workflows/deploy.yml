@@ -1,0 +1,38 @@
+name: Deploy Marble NER API
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        type: string
+        description: "Environment to deploy to"
+        required: false
+      image:
+        type: string
+        description: "Version to build"
+        required: true
+
+jobs:
+  deploy:
+    name: Deploy Marble NER API
+    environment: ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to GCP
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          token_format: access_token
+          project_id: ${{ vars.GCP_PROJECT_ID }}
+          workload_identity_provider: ${{ vars.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.SERVICE_ACCOUNT_EMAIL }}
+
+      - name: Deploy API
+        run: |
+          gcloud run deploy marble-ner \
+            --quiet \
+            --image=${{ input.image }} \
+            --region=europe-west1
