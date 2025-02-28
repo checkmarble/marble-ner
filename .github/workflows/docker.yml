@@ -50,4 +50,4 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: ${{ inputs.push }}
-          tags: ${{ inputs.image }}
+          tags: ${{ inputs.image || 'local/marble-ner:dev' }}
