@@ -8,9 +8,9 @@ on:
         type: string
         description: "Environment to deploy to"
         required: false
-      version:
+      image:
         type: string
-        description: Version to build
+        description: Container image name and version
         required: true
       push:
         type: boolean
@@ -53,6 +53,5 @@ jobs:
     needs: [test]
     with:
       environment: ${{ inputs.environment }}
-      image: europe-west1-docker.pkg.dev/marble-infra/marble/marble-ner:${{ inputs.version || 'dev' }}
+      image: ${{ inputs.image }}
       push: ${{ inputs.push || false }}
-            

@@ -12,10 +12,15 @@ jobs:
       id-token: write
     with:
       environment: staging
-      version: latest
+      image: europe-west1-docker.pkg.dev/marble-infra/marble/marble-ner:latest
+      push: true
 
   deploy:
     needs: [build]
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo Deploying...
+    uses: ./.github/workflows/deploy.yml
+    permissions:
+      contents: read
+      id-token: write
+    with:
+      environment: staging
+      image: europe-west1-docker.pkg.dev/marble-infra/marble/marble-ner:latest
