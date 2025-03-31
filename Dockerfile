@@ -7,8 +7,8 @@ ENV GLINER_MODEL=urchade/gliner_medium-v2.1
 EXPOSE 9000
 
 RUN \
-  apt update && \
-  apt install -y pipx && \
+  apt update && apt upgrade -y && \
+  apt install -y --no-install-recommends pipx && \
   pipx install poetry && \
   rm -rf /var/cache/apt
 
