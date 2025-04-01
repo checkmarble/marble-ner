@@ -3,7 +3,7 @@ name = "marble-ner"
 version = "0.1.0"
 description = ""
 authors = [
-    {name = "Antoine Popineau",email = "antoine.popineau@checkmarble.com"}
+    { name = "Antoine Popineau", email = "antoine.popineau@checkmarble.com" },
 ]
 readme = "README.md"
 requires-python = ">=3.11"
@@ -15,6 +15,17 @@ dependencies = [
     "gliner (>=0.2.16,<0.3.0)",
     "httpx (>=0.28.1,<0.29.0)",
 ]
+
+[tool.poetry.dependencies]
+torch = [
+    { platform = "linux", source = "torch-cpu" },
+    { platform = "darwin", source = "PyPI" },
+]
+
+[[tool.poetry.source]]
+name = "torch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+priority = "explicit"
 
 [tool.poetry]
 package-mode = false
