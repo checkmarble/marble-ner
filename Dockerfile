@@ -23,7 +23,7 @@ RUN \
     /venv/bin/python -c 'import os, gliner; gliner.GLiNER.from_pretrained(os.getenv("GLINER_MODEL"))' && \
     chown -R 65532:65532 /root/.cache/huggingface
 
-FROM al3xos/python-distroless:3.12-debian12-debug
+FROM al3xos/python-distroless:3.12-debian12
 LABEL maintainer="Antoine Popineau <antoine.popineau@checkmarble.com>"
 
 WORKDIR /app
