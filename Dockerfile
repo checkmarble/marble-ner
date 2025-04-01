@@ -1,4 +1,4 @@
-FROM debian:bookworm-slim AS py
+FROM python:3.12-bookworm AS py
 LABEL maintainer="Antoine Popineau <antoine.popineau@checkmarble.com>"
 
 WORKDIR /app
@@ -7,7 +7,7 @@ ENV GLINER_MODEL=urchade/gliner_medium-v2.1
 
 RUN \
     apt update && apt upgrade -y && \
-    apt install -y --no-install-suggests --no-install-recommends pipx python3 python3-pip && \
+    apt install -y --no-install-suggests --no-install-recommends pipx && \
     pipx install poetry && \
     pipx inject poetry poetry-plugin-export && \
     rm -rf /var/cache/apt
@@ -23,11 +23,11 @@ RUN \
     /venv/bin/python -c 'import os, gliner; gliner.GLiNER.from_pretrained(os.getenv("GLINER_MODEL"))' && \
     chown -R 65532:65532 /root/.cache/huggingface
 
-FROM al3xos/python-distroless:3.11.11-debian12
+FROM al3xos/python-distroless:3.12-debian12-debug
 LABEL maintainer="Antoine Popineau <antoine.popineau@checkmarble.com>"
 
 WORKDIR /app
-ENV PYTHONPATH=/venv/lib/python3.11/site-packages
+ENV PYTHONPATH=/venv/lib/python3.12/site-packages
 USER nonroot
 
 COPY --from=py /venv /venv
