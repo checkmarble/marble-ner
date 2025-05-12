@@ -31,3 +31,13 @@ $ curl -XPOST 127.0.0.1:9000/detect -H content-type:application/json -d \
   }
 ]
 ```
+
+## Develop
+
+```
+$ poetry install
+# Either run it directly with uvicorn
+$ NER_API_KEY=apikey poetry run uvicorn --workers=1 main:main
+# Or run as as production through gunicorn
+$ NER_API_KEY=apikey poetry run gunicorn --bind=0.0.0.0:9000 --workers=1 --preload --worker-class=uvicorn.workers.UvicornWorker main:app
+```
