@@ -18,6 +18,10 @@ on:
         required: false
         default: true
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -51,6 +55,9 @@ jobs:
   build:
     uses: ./.github/workflows/docker.yml
     needs: [test]
+    permissions:
+      contents: read
+      id-token: write
     with:
       environment: ${{ inputs.environment }}
       image: ${{ inputs.image }}

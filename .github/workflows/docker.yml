@@ -16,6 +16,10 @@ on:
         description: "Whether to push the container image or not"
         default: false
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   build_container_image:
     name: Build container image
