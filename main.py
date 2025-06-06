@@ -47,7 +47,6 @@ def detect(settings: Annotated[Settings, Depends(settings)], token: Annotated[st
 
     return {"detail": "Not authenticated"}
 
-  print(settings.labels)
   entities = model.predict_entities(query.text, settings.labels, threshold=0.1)
 
   matches = []
