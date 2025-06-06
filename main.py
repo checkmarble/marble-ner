@@ -11,9 +11,6 @@ from gliner import GLiNER
 from pydantic import BaseModel
 from functools import lru_cache
 
-if os.getenv('NER_API_KEY') is None:
-    raise Exception('NER_API_KEY must be defined')
-
 MODEL=os.getenv("GLINER_MODEL", "urchade/gliner_medium-v2.1")
 LABELS=os.getenv("GLINER_LABELS", "Person,Company").split(",")
 
