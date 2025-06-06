@@ -12,9 +12,10 @@ RUN \
     pipx inject poetry poetry-plugin-export && \
     rm -rf /var/cache/apt
 
-COPY pyproject.toml poetry.lock /app/
+COPY pyproject.cpu.toml /app/pyproject.toml
 
 RUN \
+    poetry lock && \
     poetry export --format=requirements.txt --output requirements.txt && \
     python3 -m venv /venv && \
     /venv/bin/python -m pip install -r requirements.txt
