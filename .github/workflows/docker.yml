@@ -3,17 +3,26 @@ name: Build container image
 on:
   workflow_call:
     inputs:
+      target:
+        type: string
+        description: Target hardware type
+        required: true
       environment:
         type: string
-        description: "Environment to deploy to"
+        description: Environment to deploy to
         required: false
       image:
         type: string
-        description: "Version to build"
+        description: Docker image to build
         required: true
+      version:
+        type: string
+        description: Docker image version to build
+        required: false
+        default: dev
       push:
         type: boolean
-        description: "Whether to push the container image or not"
+        description: Whether to push the container image or not
         default: false
 
 permissions:
@@ -53,5 +62,6 @@ jobs:
       - name: Build container image
         uses: docker/build-push-action@v5
         with:
+          build-args: "TARGET=${{ inputs.target }}"
           push: ${{ inputs.push }}
-          tags: ${{ inputs.image || 'local/marble-ner:dev' }}
+          tags: ${{ inputs.image || 'local/marble-ner' }}:${{ inputs.version }}-${{ inputs.target }}

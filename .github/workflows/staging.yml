@@ -12,7 +12,8 @@ jobs:
       id-token: write
     with:
       environment: staging
-      image: europe-west1-docker.pkg.dev/marble-infra/marble/marble-ner:latest
+      image: europe-west1-docker.pkg.dev/marble-infra/marble/marble-ner
+      version: latest
       push: true
 
   deploy:
@@ -23,4 +24,5 @@ jobs:
       id-token: write
     with:
       environment: staging
-      image: europe-west1-docker.pkg.dev/marble-infra/marble/marble-ner:latest
+      image: europe-west1-docker.pkg.dev/marble-infra/marble/marble-ner
+      version: latest-cpu

@@ -10,8 +10,13 @@ on:
         required: false
       image:
         type: string
-        description: Container image name and version
+        description: Container image name
         required: true
+      version:
+        type: string
+        description: Container image version
+        required: false
+        default: dev
       push:
         type: boolean
         description: Whether to push the image or not
@@ -24,6 +29,9 @@ permissions:
 
 jobs:
   test:
+    strategy:
+      matrix:
+        target: ["cpu", "gpu"]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -39,12 +47,14 @@ jobs:
         run: |
           poetry config virtualenvs.create true --local
           poetry config virtualenvs.in-project true --local
+          ln -sf pyproject.${{ matrix.target }}.toml pyproject.toml
+          ln -sf poetry.${{ matrix.target }}.lock poetry.lock
 
       - uses: actions/cache@v3
         name: Define a cache for the virtual environment based on the dependencies lock file
         with:
           path: ./.venv
-          key: venv-${{ hashFiles('poetry.lock') }}
+          key: venv-^{{ matrix.target }}-${{ hashFiles('poetry.lock') }}
 
       - name: Install the project dependencies
         run: poetry install
@@ -53,6 +63,9 @@ jobs:
         run: poetry run pytest -v
 
   build:
+    strategy:
+      matrix:
+        target: ["cpu", "gpu"]
     uses: ./.github/workflows/docker.yml
     needs: [test]
     permissions:
@@ -60,5 +73,7 @@ jobs:
       id-token: write
     with:
       environment: ${{ inputs.environment }}
+      target: ${{ matrix.target }}
       image: ${{ inputs.image }}
+      version: ${{ inputs.version || 'dev' }}
       push: ${{ inputs.push || false }}

@@ -1,6 +1,8 @@
 FROM python:3.12-bookworm AS py
 LABEL maintainer="Antoine Popineau <antoine.popineau@checkmarble.com>"
 
+ARG TARGET='cpu'
+
 WORKDIR /app
 ENV PATH="/root/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 ENV GLINER_MODEL=urchade/gliner_medium-v2.1
@@ -12,7 +14,7 @@ RUN \
     pipx inject poetry poetry-plugin-export && \
     rm -rf /var/cache/apt
 
-COPY pyproject.cpu.toml /app/pyproject.toml
+COPY pyproject.${TARGET}.toml /app/pyproject.toml
 
 RUN \
     poetry lock && \
