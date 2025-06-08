@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 import os
 
 import uvicorn
+import torch
 
 from typing import Annotated, List
 
@@ -10,6 +11,11 @@ from fastapi.security import OAuth2PasswordBearer
 from gliner import GLiNER
 from pydantic import BaseModel
 from functools import lru_cache
+
+print(f"Starting Marble NER - pytorch={torch.__version__} - gpu={torch.cuda.is_available()} - cuda={torch.version.cuda}")
+
+if os.getenv('NER_API_KEY') is None:
+    raise Exception('NER_API_KEY must be defined')
 
 MODEL=os.getenv("GLINER_MODEL", "urchade/gliner_medium-v2.1")
 LABELS=os.getenv("GLINER_LABELS", "Person,Company").split(",")

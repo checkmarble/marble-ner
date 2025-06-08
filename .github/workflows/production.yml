@@ -13,7 +13,8 @@ jobs:
       id-token: write
     with:
       environment: production
-      image: europe-west1-docker.pkg.dev/marble-infra/marble/marble-ner:${{ github.ref_name }}
+      image: europe-west1-docker.pkg.dev/marble-infra/marble/marble-ner
+      version: ${{ github.ref_name }}
       push: true
 
   deploy:
@@ -24,4 +25,5 @@ jobs:
       id-token: write
     with:
       environment: production
-      image: europe-west1-docker.pkg.dev/marble-infra/marble/marble-ner:${{ github.ref_name }}
+      image: europe-west1-docker.pkg.dev/marble-infra/marble/marble-ner
+      version: ${{ github.ref_name }}-cpu

@@ -5,11 +5,15 @@ on:
     inputs:
       environment:
         type: string
-        description: "Environment to deploy to"
+        description: Environment to deploy to
         required: false
       image:
         type: string
-        description: "Version to build"
+        description: Docker image to deploy
+        required: true
+      version:
+        type: string
+        description: Docker image version to deploy
         required: true
 
 permissions:
@@ -38,5 +42,5 @@ jobs:
         run: |
           gcloud run deploy marble-ner \
             --quiet \
-            --image=${{ inputs.image }} \
+            --image=${{ inputs.image }}:${{ inputs.version }} \
             --region=europe-west1
