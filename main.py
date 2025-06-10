@@ -9,11 +9,11 @@ from typing import Annotated, List
 from fastapi import Depends, FastAPI, Response
 from fastapi.security import OAuth2PasswordBearer
 from gliner import GLiNER
-from pathlib import Path
 from pydantic import BaseModel
 from functools import lru_cache
+from logger import LogMiddleware, logger
 
-print(f"Starting Marble NER - pytorch={torch.__version__} - gpu={torch.cuda.is_available()} - cuda={torch.version.cuda}")
+logger.info("starting marble ner", extra={"ner.pytorch": torch.__version__, "ner.gpu": torch.cuda.is_available(), "ner.cuda": torch.version.cuda})
 
 if os.getenv('NER_API_KEY') is None:
     raise Exception('NER_API_KEY must be defined')
@@ -36,10 +36,11 @@ class Match(BaseModel):
   type: str
   text: str
 
-print("Loading model from {MODEL}")
+logger.info("loading model", extra={"ner.path": MODEL})
 
 model = GLiNER.from_pretrained(MODEL)
 app = FastAPI()
+app.add_middleware(LogMiddleware)
 auth = OAuth2PasswordBearer(tokenUrl='')
 
 @app.get("/-/health")
