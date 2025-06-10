@@ -13,7 +13,7 @@ jobs:
     with:
       environment: staging
       image: europe-west1-docker.pkg.dev/marble-infra/marble/marble-ner
-      version: latest
+      version: ${{ github.sha }}
       push: true
 
   deploy:
@@ -25,4 +25,4 @@ jobs:
     with:
       environment: staging
       image: europe-west1-docker.pkg.dev/marble-infra/marble/marble-ner
-      version: latest-cpu
+      version: ${{ github.sha }}-cpu
