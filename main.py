@@ -9,6 +9,7 @@ from typing import Annotated, List
 from fastapi import Depends, FastAPI, Response
 from fastapi.security import OAuth2PasswordBearer
 from gliner import GLiNER
+from pathlib import Path
 from pydantic import BaseModel
 from functools import lru_cache
 
@@ -35,7 +36,8 @@ class Match(BaseModel):
   type: str
   text: str
 
-model = GLiNER.from_pretrained(MODEL)
+offline = Path(os.path.join(Path.home(), ".cache/huggingface/hub", f"models--{MODEL.replace("/", "--")}")).is_dir()
+model = GLiNER.from_pretrained(MODEL, local_files_only=offline)
 app = FastAPI()
 auth = OAuth2PasswordBearer(tokenUrl='')
 
