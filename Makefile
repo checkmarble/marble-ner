@@ -3,7 +3,10 @@
 OS_NAME := $(shell uname -s)
 
 prepare:
-	@if [ -z "$(TARGET) ]; then $(error "TARGET variable is required to be either 'cpu' or 'gpu'"); fi
+	@if [ -z "$(TARGET)" ] ; then \
+        echo "TARGET variable is required to be either 'cpu' or 'gpu'" ; \
+        exit 1 ; \
+    fi
 
 ifeq ($(TARGET), gpu)
 	@ln -sf pyproject.gpu.toml pyproject.toml
