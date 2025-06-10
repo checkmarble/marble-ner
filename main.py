@@ -36,8 +36,9 @@ class Match(BaseModel):
   type: str
   text: str
 
-offline = Path(os.path.join(Path.home(), ".cache/huggingface/hub", f"models--{MODEL.replace("/", "--")}")).is_dir()
-model = GLiNER.from_pretrained(MODEL, local_files_only=offline)
+print("Loading model from {MODEL}")
+
+model = GLiNER.from_pretrained(MODEL)
 app = FastAPI()
 auth = OAuth2PasswordBearer(tokenUrl='')
 

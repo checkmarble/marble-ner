@@ -23,8 +23,8 @@ RUN \
     /venv/bin/python -m pip install -r requirements.txt
 
 RUN \
-    /venv/bin/python -c 'import os, gliner; gliner.GLiNER.from_pretrained(os.getenv("GLINER_MODEL"))' && \
-    chown -R 65532:65532 /root/.cache/huggingface
+    /venv/bin/python -c 'import os, gliner; m = gliner.GLiNER.from_pretrained(os.getenv("GLINER_MODEL")); m.save_pretrained("/tmp/model"); m.config.to_json_file("/tmp/model/config.json")' && \
+    chown -R 65532:65532 /tmp/model
 
 FROM al3xos/python-distroless:3.12-debian12
 LABEL maintainer="Antoine Popineau <antoine.popineau@checkmarble.com>"
@@ -34,9 +34,10 @@ ENV PYTHONPATH=/venv/lib/python3.12/site-packages
 USER nonroot
 
 COPY --from=py /venv /venv
-COPY --from=py /root/.cache/huggingface /home/nonroot/.cache/huggingface
+COPY --from=py /tmp/model /home/nonroot/model
 COPY . /app
 
 EXPOSE 9000
 ENTRYPOINT ["python"]
+ENV GLINER_MODEL=/home/nonroot/model
 CMD ["/venv/bin/gunicorn", "--bind=0.0.0.0:9000", "--preload", "--workers=8", "--worker-class=uvicorn.workers.UvicornWorker", "main:app"]
