@@ -3,77 +3,53 @@ name: Build and test
 on:
   pull_request:
   workflow_call:
-    inputs:
-      environment:
-        type: string
-        description: "Environment to deploy to"
-        required: false
-      image:
-        type: string
-        description: Container image name
-        required: true
-      version:
-        type: string
-        description: Container image version
-        required: false
-        default: dev
-      push:
-        type: boolean
-        description: Whether to push the image or not
-        required: false
-        default: true
 
 permissions:
   contents: read
   id-token: write
 
 jobs:
-  test:
+  check:
     strategy:
       matrix:
-        target: ["cpu", "gpu"]
+        target: ["cpu"]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install Python
-        uses: actions/setup-python@v4
+      - uses: dtolnay/rust-toolchain@stable
 
-      - name: Install poetry
-        uses: abatilo/actions-poetry@v4
+      - name: Check
+        run: cargo check --features ${{ matrix.target }}
 
-      - name: Setup a local virtual environment
-        run: |
-          poetry config virtualenvs.create true --local
-          poetry config virtualenvs.in-project true --local
-          ln -sf pyproject.${{ matrix.target }}.toml pyproject.toml
-          ln -sf poetry.${{ matrix.target }}.lock poetry.lock
+  lint:
+    strategy:
+      matrix:
+        target: ["cpu"]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: actions/cache@v3
-        name: Define a cache for the virtual environment based on the dependencies lock file
+      - uses: dtolnay/rust-toolchain@stable
         with:
-          path: ./.venv
-          key: venv-^{{ matrix.target }}-${{ hashFiles('poetry.lock') }}
+          components: clippy
 
-      - name: Install the project dependencies
-        run: poetry install
-
-      - name: Run the automated tests (for example)
-        run: poetry run pytest -v
+      - name: Lint
+        run: cargo clippy --features ${{ matrix.target }} -- -D warnings
 
   build:
     strategy:
       matrix:
-        target: ["cpu", "gpu"]
-    uses: ./.github/workflows/docker.yml
-    needs: [test]
-    permissions:
-      contents: read
-      id-token: write
-    with:
-      environment: ${{ inputs.environment }}
-      target: ${{ matrix.target }}
-      image: ${{ inputs.image }}
-      version: ${{ inputs.version || 'dev' }}
-      push: ${{ inputs.push || false }}
+        target: ["cpu"]
+    needs: [check, lint]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Build
+        run: cargo build --release --features ${{ matrix.target }}

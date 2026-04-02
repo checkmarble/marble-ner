@@ -1,43 +1,33 @@
-FROM python:3.12-bookworm AS py
+FROM rust:1.94.1-slim-trixie AS base
 LABEL maintainer="Antoine Popineau <antoine.popineau@checkmarble.com>"
-
-ARG TARGET='cpu'
-
 WORKDIR /app
-ENV PATH="/root/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-ENV GLINER_MODEL=urchade/gliner_medium-v2.1
 
 RUN \
     apt update && apt upgrade -y && \
-    apt install -y --no-install-suggests --no-install-recommends pipx && \
-    pipx install poetry && \
-    pipx inject poetry poetry-plugin-export && \
-    rm -rf /var/cache/apt
-
-COPY pyproject.${TARGET}.toml /app/pyproject.toml
+    apt install -y --no-install-suggests --no-install-recommends ca-certificates git git-lfs
 
 RUN \
-    poetry lock && \
-    poetry export --format=requirements.txt --output requirements.txt && \
-    python3 -m venv /venv && \
-    /venv/bin/python -m pip install -r requirements.txt
+    git clone --depth 1 https://huggingface.co/onnx-community/gliner_small-v2.1 model && \
+    git -C ./model lfs pull
+
+FROM rust:1.94.1-slim-trixie AS builder
+WORKDIR /app
 
 RUN \
-    /venv/bin/python -c 'import os, gliner; m = gliner.GLiNER.from_pretrained(os.getenv("GLINER_MODEL")); m.save_pretrained("/tmp/model"); m.config.to_json_file("/tmp/model/config.json")' && \
-    chown -R 65532:65532 /tmp/model
+    apt update && apt upgrade -y && \
+    apt install -y --no-install-suggests --no-install-recommends build-essential
 
-FROM al3xos/python-distroless:3.12-debian12
+COPY . /app
+RUN cargo build --release --features cpu
+
+FROM gcr.io/distroless/cc-debian13:nonroot
 LABEL maintainer="Antoine Popineau <antoine.popineau@checkmarble.com>"
 
 WORKDIR /app
-ENV PYTHONPATH=/venv/lib/python3.12/site-packages
 USER nonroot
 
-COPY --from=py /venv /venv
-COPY --from=py /tmp/model /home/nonroot/model
-COPY . /app
+COPY --from=builder /app/target/release/ner /ner
+COPY --from=base /app/model /tmp/model
 
-EXPOSE 9000
-ENTRYPOINT ["python"]
-ENV GLINER_MODEL=/home/nonroot/model
-CMD ["/venv/bin/gunicorn", "--bind=0.0.0.0:9000", "--preload", "--workers=8", "--worker-class=uvicorn.workers.UvicornWorker", "main:app"]
+ENV MODEL_PATH=/tmp/model
+ENTRYPOINT ["/ner"]

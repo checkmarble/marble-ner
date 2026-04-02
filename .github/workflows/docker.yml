@@ -3,10 +3,6 @@ name: Build container image
 on:
   workflow_call:
     inputs:
-      target:
-        type: string
-        description: Target hardware type
-        required: true
       environment:
         type: string
         description: Environment to deploy to
@@ -34,6 +30,9 @@ jobs:
     name: Build container image
     environment: ${{ inputs.environment }}
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target: ["cpu"]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -62,6 +61,6 @@ jobs:
       - name: Build container image
         uses: docker/build-push-action@v5
         with:
-          build-args: "TARGET=${{ inputs.target }}"
+          build-args: "TARGET=${{ matrix.target }}"
           push: ${{ inputs.push }}
           tags: ${{ inputs.image || 'local/marble-ner' }}:${{ inputs.version }}-${{ inputs.target }}

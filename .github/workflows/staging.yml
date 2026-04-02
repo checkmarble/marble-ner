@@ -7,6 +7,10 @@ on:
 jobs:
   build:
     uses: ./.github/workflows/build.yml
+
+  docker:
+    needs: [build]
+    uses: ./.github/workflows/docker.yml
     permissions:
       contents: read
       id-token: write
@@ -17,7 +21,7 @@ jobs:
       push: true
 
   deploy:
-    needs: [build]
+    needs: [docker]
     uses: ./.github/workflows/deploy.yml
     permissions:
       contents: read
