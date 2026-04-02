@@ -1,4 +1,4 @@
-name: Deploy to staging
+name: Deploy to production
 
 on:
   push:
@@ -8,17 +8,21 @@ on:
 jobs:
   build:
     uses: ./.github/workflows/build.yml
+
+  docker:
+    needs: [build]
+    uses: ./.github/workflows/docker.yml
     permissions:
       contents: read
       id-token: write
     with:
       environment: production
       image: europe-west1-docker.pkg.dev/marble-infra/marble/marble-ner
-      version: ${{ github.ref_name }}
+      version: ${{ github.sha }}
       push: true
 
   deploy:
-    needs: [build]
+    needs: [docker]
     uses: ./.github/workflows/deploy.yml
     permissions:
       contents: read

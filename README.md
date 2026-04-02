@@ -1,4 +1,4 @@
-# Marble Name Entity Recognition API
+# Marble Name Entity Recognition API (to be edited)
 
 This repository powers Marble's Name Entity Recognition (NER) used within the Sanctions Check feature.
 

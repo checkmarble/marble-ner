@@ -1,5 +1,2 @@
-__pycache__/
-.pytest_cache/
-.env
-pyproject.toml
-poetry.lock
+/model
+/target
