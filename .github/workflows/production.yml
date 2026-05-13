@@ -30,4 +30,4 @@ jobs:
     with:
       environment: production
       image: europe-west1-docker.pkg.dev/marble-infra/marble/marble-ner
-      version: ${{ github.ref_name }}-cpu
+      version: ${{ github.ref_name }}

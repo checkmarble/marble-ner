@@ -29,4 +29,4 @@ jobs:
     with:
       environment: staging
       image: europe-west1-docker.pkg.dev/marble-infra/marble/marble-ner
-      version: ${{ github.sha }}-cpu
+      version: ${{ github.sha }}

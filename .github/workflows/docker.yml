@@ -63,4 +63,4 @@ jobs:
         with:
           build-args: "TARGET=${{ matrix.target }}"
           push: ${{ inputs.push }}
-          tags: ${{ inputs.image || 'local/marble-ner' }}:${{ inputs.version }}-${{ inputs.target }}
+          tags: ${{ inputs.image || 'local/marble-ner' }}:${{ inputs.version }}
