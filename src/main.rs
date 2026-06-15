@@ -16,8 +16,10 @@ pub struct AppState {
 
 #[tokio::main]
 async fn main() {
+  let port: u16 = env::var("PORT").ok().and_then(|p| p.parse().ok()).unwrap_or(8080);
+
   let _guard = trace::init_tracing(std::io::stdout());
-  let listener = tokio::net::TcpListener::bind("0.0.0.0:8080").await.unwrap();
+  let listener = tokio::net::TcpListener::bind(&format!("0.0.0.0:{port}")).await.unwrap();
 
   let _label = inference::labels();
   let _preload = inference::model();
