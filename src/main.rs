@@ -37,7 +37,7 @@ async fn main() {
 
   tracing::info!("listening on {}", listener.local_addr().unwrap());
 
-  let _ = axum::serve(listener, app).await;
+  let _ = axum::serve(listener, app).with_graceful_shutdown(shutdown()).await;
 }
 
 async fn health() {}
@@ -78,5 +78,20 @@ async fn handler(_: Auth, Json(input): Json<Input>) -> (StatusCode, Json<Vec<Out
 
       (StatusCode::INTERNAL_SERVER_ERROR, Json(vec![]))
     }
+  }
+}
+
+async fn shutdown() {
+  use tokio::signal::{self, unix::SignalKind};
+
+  let ctrl_c = async { signal::ctrl_c().await.expect("failed to install sigint handler") };
+
+  let terminate = async {
+    signal::unix::signal(SignalKind::terminate()).expect("failed to install sigterm handler").recv().await;
+  };
+
+  tokio::select! {
+      () = ctrl_c => tracing::info!("received ^C, initiating shutdown"),
+      () = terminate => tracing::info!("received terminate signal, initiating shutdown")
   }
 }
