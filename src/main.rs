@@ -49,6 +49,7 @@ struct Input {
 
 #[derive(Serialize)]
 struct Output {
+  #[serde(rename = "type")]
   kind: String,
   text: String,
 }
