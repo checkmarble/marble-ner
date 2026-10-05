@@ -20,7 +20,7 @@ jobs:
     with:
       environment: production
       image: europe-west1-docker.pkg.dev/marble-infra/marble/marble-ner
-      version: ${{ github.sha }}
+      version: ${{ github.ref_name }}
       push: true
 
   deploy:
